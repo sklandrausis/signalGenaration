@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+
 #include "vdifio.h"
 
 using namespace std;
@@ -29,7 +31,7 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
 
-    float delay = atof(argv[3]);
+    int delay = atof(argv[3]);
 
     header = (vdif_header*)&buffer;
     framesread = 0;
@@ -49,13 +51,12 @@ int main(int argc, char **argv){
 
     readbytes = fwrite(buffer, 1, VDIF_HEADER_BYTES, output); //write out the VDIF header
     readbytes = fread(buffer, 1, framebytes-VDIF_HEADER_BYTES, input); //read the VDIF data segment
+    for (int i = 0; i<MAX_VDIF_FRAME_BYTES; i++){
+        buffer[i] = (uint32_t)buffer[i] + delay;
+    }
     readbytes = fwrite(buffer, 1, framebytes-VDIF_HEADER_BYTES, output); //write out the VDIF data segment
 
     framesread++;
-    }
-
-    for (int i = 0; i<10; i++){
-        cout<<buffer[i]<<endl;
     }
 
     printf("Read and wrote %lld frames\n", framesread);
